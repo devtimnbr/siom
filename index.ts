@@ -2,12 +2,22 @@ import http from "http";
 import sharp from "sharp";
 import fetch from "node-fetch";
 
-const host = "localhost";
+const host = "0.0.0.0";
 const port = 8000;
 
 const formatValues = ["jpeg", "png", "webp", "gif"];
 const fitValues = ["cover", "contain", "fill", "inside", "outside"];
-const positionValues = ["center", "top", "right top", "right", "right bottom", "bottom", "left bottom", "left", "left-top"];
+const positionValues = [
+  "center",
+  "top",
+  "right top",
+  "right",
+  "right bottom",
+  "bottom",
+  "left bottom",
+  "left",
+  "left-top",
+];
 
 const isHexColor = /^#([0-9a-f]{3}){1,2}$/i;
 
@@ -30,7 +40,10 @@ const getParams = (params: URLSearchParams) => ({
   format: params.get("format") ? (params.get("format") as string) : "webp",
 });
 
-const requestListener = async (req: http.IncomingMessage, res: http.ServerResponse) => {
+const requestListener = async (
+  req: http.IncomingMessage,
+  res: http.ServerResponse
+) => {
   let url = new URL(req.url as string, "http://" + host);
   let { img, w, h, q, f, p, b, format } = getParams(url.searchParams);
 
@@ -47,7 +60,11 @@ const requestListener = async (req: http.IncomingMessage, res: http.ServerRespon
     }
 
     if (formatValues.indexOf(format) < 0) {
-      throw Error(`Invalid format value in params. Supported are: ${JSON.stringify(formatValues)} `);
+      throw Error(
+        `Invalid format value in params. Supported are: ${JSON.stringify(
+          formatValues
+        )} `
+      );
     }
 
     if (!isHexColor.test(b)) {
@@ -57,8 +74,16 @@ const requestListener = async (req: http.IncomingMessage, res: http.ServerRespon
     let externalImageRes = await fetch(img);
     let externalImage = await externalImageRes.arrayBuffer();
 
-    let imgBuffer = await sharp(Buffer.from(externalImage), { animated: format === "gif" })
-      .resize({ width: w, height: h, fit: f as any, background: b, position: p })
+    let imgBuffer = await sharp(Buffer.from(externalImage), {
+      animated: format === "gif",
+    })
+      .resize({
+        width: w,
+        height: h,
+        fit: f as any,
+        background: b,
+        position: p,
+      })
       .toFormat(format as any, { quality: q })
       .toBuffer();
 
