@@ -35,7 +35,7 @@ const getParams = (params: URLSearchParams) => ({
   // position
   p: params.get("p") ? (params.get("p") as string) : "center",
   // backroundColor
-  bg: params.get("bg") ? "#" + (params.get("b") as string) : "#000",
+  bg: params.get("bg") ? "#" + (params.get("bg") as string) : "#000",
   // format
   format: params.get("format") ? (params.get("format") as string) : "webp",
 });
@@ -66,6 +66,8 @@ const requestListener = async (
         )} `
       );
     }
+
+    console.log({ bg });
 
     if (!isHexColor.test(bg)) {
       throw Error(`Invalid hex color value in params`);
