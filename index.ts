@@ -23,7 +23,7 @@ const isHexColor = /^#([0-9a-f]{3}){1,2}$/i;
 
 const getParams = (params: URLSearchParams) => ({
   // external img url
-  img: params.get("img"),
+  src: params.get("src"),
   // width
   w: params.get("w") ? Number(params.get("w")) : undefined,
   // height
@@ -35,7 +35,7 @@ const getParams = (params: URLSearchParams) => ({
   // position
   p: params.get("p") ? (params.get("p") as string) : "center",
   // backroundColor
-  b: params.get("b") ? "#" + (params.get("b") as string) : "#000",
+  bg: params.get("bg") ? "#" + (params.get("b") as string) : "#000",
   // format
   format: params.get("format") ? (params.get("format") as string) : "webp",
 });
@@ -45,10 +45,10 @@ const requestListener = async (
   res: http.ServerResponse
 ) => {
   let url = new URL(req.url as string, "http://" + host);
-  let { img, w, h, q, f, p, b, format } = getParams(url.searchParams);
+  let { src, w, h, q, f, p, bg, format } = getParams(url.searchParams);
 
   try {
-    if (!img) {
+    if (!src) {
       throw Error("No img in search parameters provided");
     }
     if (fitValues.indexOf(f) < 0) {
@@ -67,11 +67,11 @@ const requestListener = async (
       );
     }
 
-    if (!isHexColor.test(b)) {
+    if (!isHexColor.test(bg)) {
       throw Error(`Invalid hex color value in params`);
     }
 
-    let externalImageRes = await fetch(img);
+    let externalImageRes = await fetch(src);
     let externalImage = await externalImageRes.arrayBuffer();
 
     let imgBuffer = await sharp(Buffer.from(externalImage), {
@@ -81,7 +81,7 @@ const requestListener = async (
         width: w,
         height: h,
         fit: f as any,
-        background: b,
+        background: bg,
         position: p,
       })
       .toFormat(format as any, { quality: q })
