@@ -67,8 +67,6 @@ const requestListener = async (
       );
     }
 
-    console.log({ bg });
-
     if (!isHexColor.test(bg)) {
       throw Error(`Invalid hex color value in params`);
     }
